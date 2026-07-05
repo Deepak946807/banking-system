@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - {{ BANK_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Branch Dashboard</h1>
+    <a href="{{ url_for('create_account') }}" class="btn btn-primary">+ Open New Account</a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="stats-col">
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-label">Total Accounts</span>
+                <span class="stat-value" data-value="{{ accounts|length if query else (breakdown.values()|sum) }}">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Total Deposits</span>
+                <span class="stat-value" data-value="{{ total }}" data-currency>₹0.00</span>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-label">Savings Accounts</span>
+                <span class="stat-value" data-value="{{ breakdown.get('Savings', 0) }}">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Current Accounts</span>
+                <span class="stat-value" data-value="{{ breakdown.get('Current', 0) }}">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="kyc-check-card">
+        <h3>KYC Duplicate Check</h3>
+        <p class="field-hint">
+            Enter Aadhaar <strong>or</strong> PAN — either one alone is enough to check whether
+            this person already holds an account with us.
+        </p>
+        <form method="GET" class="kyc-check-form">
+            <input type="text" name="check_aadhar" value="{{ kyc_check.aadhar if kyc_check else '' }}"
+                   placeholder="Aadhaar Number (optional)" maxlength="14" inputmode="numeric">
+            <input type="text" name="check_pan" value="{{ kyc_check.pan if kyc_check else '' }}"
+                   placeholder="PAN Number (optional)" maxlength="10" style="text-transform:uppercase;">
+            <button type="submit" class="btn btn-small btn-full">Check</button>
+        </form>
+        {% if kyc_check %}
+            {% if kyc_check.matches %}
+            <div class="kyc-result kyc-result-warning">
+                ⚠️ {{ kyc_check.matches|length }} account(s) already exist with these details:
+                <ul>
+                    {% for m in kyc_check.matches %}
+                    <li><a href="{{ url_for('account_detail', acc_no=m.account_number) }}">{{ m.account_number }} — {{ m.owner_name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div class="kyc-result kyc-result-ok">
+                ✅ No account found — this Aadhaar/PAN is free to open a new account.
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<h2>All Accounts</h2>
+
+<form method="GET" class="search-bar">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search by name, account number, Aadhaar, or PAN...">
+    <button type="submit" class="btn btn-small">Search</button>
+    {% if query %}<a href="{{ url_for('index') }}" class="btn btn-small">Clear</a>{% endif %}
+</form>
+
+{% if accounts %}
+<div class="table-wrapper">
+    <table class="account-table">
+        <thead>
+            <tr>
+                <th>Account No.</th>
+                <th>Holder</th>
+                <th>Type</th>
+                <th>Opened</th>
+                <th>Balance</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for acc in accounts %}
+            <tr>
+                <td>{{ acc.account_number }}</td>
+                <td>{{ acc.owner_name }}</td>
+                <td><span class="badge badge-{{ acc.account_type()|lower }}">{{ acc.account_type() }}</span></td>
+                <td>{{ acc.opened_on }}</td>
+                <td class="{{ 'negative' if acc.balance < 0 else '' }}">₹{{ "%.2f"|format(acc.balance) }}</td>
+                <td><a href="{{ url_for('account_detail', acc_no=acc.account_number) }}" class="btn btn-small">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="empty-state">
+    {% if query %}No accounts match "{{ query }}".{% else %}No accounts yet. <a href="{{ url_for('create_account') }}">Open the first one</a>.{% endif %}
+</p>
+{% endif %}
+{% endblock %}

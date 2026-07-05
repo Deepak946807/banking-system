@@ -1,0 +1,48 @@
+{
+    "UNTY-1001": {
+        "account_number": "UNTY-1001",
+        "owner_name": "Deepak",
+        "balance": 2739047.0,
+        "account_type": "Savings",
+        "email": "deepakff414@gmail.com",
+        "phone": "09468071300",
+        "address": "Haryana",
+        "dob": "2005-06-28",
+        "nominee": "kk",
+        "aadhar": "789456123789",
+        "pan": "QWERT1234E",
+        "photo": "uploads/UNTY-1001.jpeg",
+        "opened_on": "2026-07-03",
+        "pin_hash": "8a3ff9c22c590a5fc172b24cfddffdcb7dc7d5a6e8cda6933ce2db6e73205bb4",
+        "transactions": [
+            {
+                "type": "DEPOSIT",
+                "amount": 6.0,
+                "balance_after": 2655960.0,
+                "note": "",
+                "timestamp": "2026-07-03 14:36:04"
+            },
+            {
+                "type": "WITHDRAW",
+                "amount": 949.0,
+                "balance_after": 2655011.0,
+                "note": "",
+                "timestamp": "2026-07-03 14:36:12"
+            },
+            {
+                "type": "DEPOSIT",
+                "amount": 84884.0,
+                "balance_after": 2739895.0,
+                "note": "",
+                "timestamp": "2026-07-04 00:59:07"
+            },
+            {
+                "type": "WITHDRAW",
+                "amount": 848.0,
+                "balance_after": 2739047.0,
+                "note": "",
+                "timestamp": "2026-07-04 00:59:16"
+            }
+        ]
+    }
+}

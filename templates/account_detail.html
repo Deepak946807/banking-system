@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{{ account.account_number }} - {{ BANK_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ account.owner_name }}</h1>
+    <span class="badge badge-{{ account.account_type()|lower }}">{{ account.account_type() }} Account</span>
+</div>
+
+<div class="detail-grid">
+    <div class="account-summary">
+        <p class="summary-label">Account Number</p>
+        <p class="summary-accno">{{ account.account_number }}</p>
+        <p class="balance {{ 'negative' if account.balance < 0 else '' }}">₹{{ "%.2f"|format(account.balance) }}</p>
+        <p class="summary-label">Opened on {{ account.opened_on }}</p>
+        {% if account.account_type() == 'Current' %}
+        <p class="summary-label">Overdraft limit: ₹{{ "%.2f"|format(account.overdraft_limit) }}</p>
+        {% else %}
+        <p class="summary-label">Interest rate: {{ (account.interest_rate * 100)|round(1) }}% p.a.</p>
+        {% endif %}
+    </div>
+
+    <div class="kyc-card">
+        <div class="kyc-card-head">
+            <h3>Customer Details</h3>
+            {% if account.photo %}
+            <img src="{{ url_for('static', filename=account.photo) }}" alt="{{ account.owner_name }}" class="kyc-photo">
+            {% else %}
+            <div class="kyc-photo kyc-photo-placeholder">👤</div>
+            {% endif %}
+        </div>
+        <dl class="kyc-list">
+            <dt>Email</dt><dd>{{ account.email or "—" }}</dd>
+            <dt>Phone</dt><dd>{{ account.phone or "—" }}</dd>
+            <dt>Address</dt><dd>{{ account.address or "—" }}</dd>
+            <dt>Date of Birth</dt><dd>{{ account.dob or "—" }}</dd>
+            <dt>Nominee</dt><dd>{{ account.nominee or "—" }}</dd>
+            <dt>Aadhaar</dt><dd>{{ account.masked_aadhar }}</dd>
+            <dt>PAN</dt><dd>{{ account.masked_pan }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="action-grid">
+    <form method="POST" action="{{ url_for('deposit', acc_no=account.account_number) }}" class="form-card">
+        <h3>Deposit</h3>
+        <div class="form-group">
+            <input type="number" name="amount" min="0.01" step="0.01" placeholder="Amount" required>
+        </div>
+        <button type="submit" class="btn btn-success btn-full">Deposit</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('withdraw', acc_no=account.account_number) }}" class="form-card">
+        <h3>Withdraw</h3>
+        <div class="form-group">
+            <input type="number" name="amount" min="0.01" step="0.01" placeholder="Amount" required>
+        </div>
+        <div class="form-group">
+            <input type="password" name="pin" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="PIN" required>
+        </div>
+        <button type="submit" class="btn btn-danger btn-full">Withdraw</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('transfer', acc_no=account.account_number) }}" class="form-card">
+        <h3>Transfer</h3>
+        <div class="form-group">
+            <input type="text" name="to_account" placeholder="To Account No." required>
+        </div>
+        <div class="form-group">
+            <input type="number" name="amount" min="0.01" step="0.01" placeholder="Amount" required>
+        </div>
+        <div class="form-group">
+            <input type="password" name="pin" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="PIN" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Transfer</button>
+    </form>
+</div>
+
+<h2>Transaction Statement</h2>
+{% if account.transactions %}
+<div class="table-wrapper">
+    <table class="account-table">
+        <thead>
+            <tr>
+                <th>Date/Time</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Balance After</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for txn in account.transactions|reverse %}
+            <tr>
+                <td>{{ txn.timestamp }}</td>
+                <td><span class="badge badge-txn">{{ txn.txn_type }}</span></td>
+                <td>₹{{ "%.2f"|format(txn.amount) }}</td>
+                <td>₹{{ "%.2f"|format(txn.balance_after) }}</td>
+                <td>{{ txn.note }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="empty-state">No transactions yet.</p>
+{% endif %}
+
+<div class="detail-actions">
+    <a href="{{ url_for('index') }}" class="btn btn-small">← Back to Dashboard</a>
+    <button onclick="window.print()" class="btn btn-small">🖨 Print Statement</button>
+</div>
+{% endblock %}

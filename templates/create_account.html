@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Open Account - {{ BANK_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Open a New Account</h1>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="form-card form-card-wide" id="createForm">
+    <fieldset>
+        <legend>Personal Details</legend>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="owner_name">Full Name *</label>
+                <input type="text" id="owner_name" name="owner_name" required placeholder="e.g. Rahul Sharma">
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="rahul@example.com">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="+91-98765-43210">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" placeholder="Street, City, State">
+        </div>
+        <div class="form-group">
+            <label for="nominee">Nominee Name</label>
+            <input type="text" id="nominee" name="nominee" placeholder="e.g. Sunita Sharma">
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Identity Verification (KYC)</legend>
+        <p class="field-hint" style="margin-bottom:14px;">
+            We use your Aadhaar and PAN to make sure you don't already hold an account with us —
+            one person can open only one account per bank.
+        </p>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="aadhar">Aadhaar Number *</label>
+                <input type="text" id="aadhar" name="aadhar" required maxlength="14"
+                       inputmode="numeric" placeholder="XXXX XXXX XXXX" autocomplete="off">
+                <p class="field-hint">12-digit Aadhaar number.</p>
+            </div>
+            <div class="form-group">
+                <label for="pan">PAN Number *</label>
+                <input type="text" id="pan" name="pan" required maxlength="10"
+                       placeholder="ABCDE1234F" autocomplete="off" style="text-transform:uppercase;">
+                <p class="field-hint">Format: 5 letters, 4 digits, 1 letter.</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="photo">Photo (optional)</label>
+            <div class="photo-upload">
+                <label for="photo" class="photo-preview" id="photoPreview">
+                    <span id="photoPreviewIcon">📷<br><small>Upload photo</small></span>
+                    <img id="photoPreviewImg" alt="Preview">
+                </label>
+                <input type="file" id="photo" name="photo" accept="image/png, image/jpeg, image/webp"
+                       onchange="previewPhoto(event)" style="display:none;">
+            </div>
+            <p class="field-hint">JPG, PNG, or WEBP — used for branch identification.</p>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Account Details</legend>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="acc_type">Account Type *</label>
+                <select id="acc_type" name="acc_type" onchange="toggleOverdraftField()">
+                    <option value="savings">Savings (earns 4% p.a. interest)</option>
+                    <option value="current">Current (overdraft facility)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="initial_deposit">Initial Deposit (₹)</label>
+                <input type="number" id="initial_deposit" name="initial_deposit" min="0" step="0.01" value="0">
+            </div>
+        </div>
+        <div class="form-group" id="overdraftGroup" style="display:none;">
+            <label for="overdraft_limit">Overdraft Limit (₹)</label>
+            <input type="number" id="overdraft_limit" name="overdraft_limit" min="0" step="0.01" value="5000">
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Security</legend>
+        <div class="form-group">
+            <label for="pin">4-Digit Transaction PIN *</label>
+            <input type="password" id="pin" name="pin" required pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="••••">
+            <p class="field-hint">You'll need this PIN to authorize withdrawals and transfers.</p>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary btn-full">Open Account</button>
+</form>
+{% endblock %}

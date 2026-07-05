@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ BANK_NAME }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <span>Est. {{ BANK_ESTD_YEAR }}</span>
+        <span class="topbar-sep">&bull;</span>
+        <span>{{ BANK_HEAD_OFFICE }}</span>
+        <span class="topbar-sep">&bull;</span>
+        <span>Support: {{ BANK_SUPPORT_PHONE }}</span>
+    </div>
+
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="brand">
+            <span class="brand-mark">UB</span>
+            <span class="brand-text">
+                <span class="brand-name">{{ BANK_NAME }}</span>
+                <span class="brand-tagline">{{ BANK_TAGLINE }}</span>
+            </span>
+        </a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('create_account') }}">Open Account</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>{{ BANK_NAME }} &copy; {{ BANK_ESTD_YEAR }}&ndash;2026 &nbsp;|&nbsp; {{ BANK_SUPPORT_EMAIL }} &nbsp;|&nbsp; Educational demo project, not a real bank.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
